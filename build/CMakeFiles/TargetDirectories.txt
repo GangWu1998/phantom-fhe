@@ -1,0 +1,15 @@
+/root/lanyan/phantom-fhe/build/CMakeFiles/Phantom.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/Boot.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/edit_cache.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/rebuild_cache.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/list_install_components.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/install.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/install/local.dir
+/root/lanyan/phantom-fhe/build/CMakeFiles/install/strip.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/bootstrapping.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/edit_cache.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/rebuild_cache.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/list_install_components.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/install.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/install/local.dir
+/root/lanyan/phantom-fhe/build/examples/CMakeFiles/install/strip.dir
