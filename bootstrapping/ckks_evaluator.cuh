@@ -93,24 +93,6 @@ class Encryptor {
   }
 };
 
-// Symmetric Encryptor
-// class Encryptor {
-//  private:
-//   PhantomContext *context;
-//   PhantomSecretKey *encryptor;
-
-//  public:
-//   Encryptor() = default;
-
-//   Encryptor(PhantomContext *context, PhantomSecretKey *encryptor) {
-//     this->context = context;
-//     this->encryptor = encryptor;
-//   }
-
-//   inline void encrypt(PhantomPlaintext &plain, PhantomCiphertext &ct) {
-//     encryptor->encrypt_symmetric(*context, plain, ct);
-//   }
-// };
 
 class Evaluator {
  private:

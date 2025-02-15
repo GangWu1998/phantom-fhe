@@ -24,18 +24,18 @@ int main() {
   long scale_factor = 2;
   long inverse_deg = 1;
 
-  // The following parameters have been adjusted to satisfy the memory constraints of an A100 GPU
+  // The following parameters have been adjusted to satisfy the memory constraints of an H800 GPU
   long logN = 16;  // 16 -> 15
   long loge = 10;
 
-  long logn = 14;  // 14 -> 13
+  long logn = 15;  // 14 -> 13
   long sparse_slots = (1 << logn);
 
   int logp = 46;
   int logq = 51;
   int log_special_prime = 51;
 
-  int secret_key_hamming_weight = 192;
+  int secret_key_hamming_weight =0;
 
   int remaining_level = 16;
   int boot_level = 14;  // >= subsum 1 + coefftoslot 2 + ModReduction 9 + slottocoeff 2
