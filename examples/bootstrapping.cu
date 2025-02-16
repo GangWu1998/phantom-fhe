@@ -35,7 +35,7 @@ int main() {
   int logq = 51;
   int log_special_prime = 51;
 
-  int secret_key_hamming_weight =0;
+  int secret_key_hamming_weight =192;
 
   int remaining_level = 16;
   int boot_level = 14;  // >= subsum 1 + coefftoslot 2 + ModReduction 9 + slottocoeff 2
