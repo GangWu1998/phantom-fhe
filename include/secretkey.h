@@ -182,18 +182,13 @@ private:
     void generate_one_kswitch_key(const PhantomContext &context, uint64_t *new_key, PhantomRelinKey &relin_key,
                                   const cudaStream_t &stream) const;
 
-    void
-    bfv_decrypt(const PhantomContext &context, const PhantomCiphertext &encrypted, PhantomPlaintext &destination,
-                const cudaStream_t &stream);
+    
 
     void
     ckks_decrypt(const PhantomContext &context, const PhantomCiphertext &encrypted, PhantomPlaintext &destination,
                  const cudaStream_t &stream);
 
-    void
-    bgv_decrypt(const PhantomContext &context, const PhantomCiphertext &encrypted, PhantomPlaintext &destination,
-                const cudaStream_t &stream);
-
+    
 public:
 
     explicit inline PhantomSecretKey(const PhantomContext &context) {

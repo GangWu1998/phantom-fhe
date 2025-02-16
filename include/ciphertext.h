@@ -28,8 +28,7 @@ private:
     // The scale this ciphertext corresponding to
     double scale_ = 1.0;
 
-    // The correction factor for BGV decryption
-    std::uint64_t correction_factor_ = 1;
+    
 
     // the degree of the scaling factor for the encrypted message
     size_t noiseScaleDeg_ = 1;
@@ -161,10 +160,7 @@ public:
         coeff_modulus_size_ = coeff_modulus_size;
     }
 
-    void set_correction_factor(std::uint64_t correction_factor) {
-        correction_factor_ = correction_factor;
-    }
-
+   
     void set_ntt_form(bool is_ntt_form) {
         is_ntt_form_ = is_ntt_form;
     }
@@ -213,10 +209,6 @@ public:
     // Newly added to make scale easily modifiable
     [[nodiscard]] auto &scale() noexcept {
         return scale_;
-    }
-
-    [[nodiscard]] auto &correction_factor() const noexcept {
-        return correction_factor_;
     }
 
     [[nodiscard]] auto data() const {
