@@ -236,3 +236,61 @@ PhantomContext::PhantomContext(const phantom::EncryptionParameters &params) {
     bool is_bfv = (params.scheme() == phantom::scheme_type::bfv);
     key_galois_tool_ = std::make_unique<PhantomGaloisTool>(params.galois_elts(), log_n, s, is_bfv);
 }
+
+    // 移动构造函数
+    PhantomContext::PhantomContext(PhantomContext&& other) noexcept 
+        : using_keyswitching_(other.using_keyswitching_),
+          mul_tech_(other.mul_tech_),
+          poly_degree_(other.poly_degree_),
+          coeff_mod_size_(other.coeff_mod_size_),
+          first_parm_index_(other.first_parm_index_),
+          context_data_(std::move(other.context_data_)),
+          plain_modulus_(std::move(other.plain_modulus_)),
+          plain_modulus_shoup_(std::move(other.plain_modulus_shoup_)),
+          coeff_div_plain_(std::move(other.coeff_div_plain_)),
+          coeff_div_plain_shoup_(std::move(other.coeff_div_plain_shoup_)),
+          plain_upper_half_increment_(std::move(other.plain_upper_half_increment_)),
+          key_galois_tool_(std::move(other.key_galois_tool_))
+    {
+        // 额外的移动逻辑
+        // 将other对象重置为默认状态
+        other.using_keyswitching_ = false;
+        other.mul_tech_ = phantom::mul_tech_type::none; // 假设有这样一个枚举值
+        other.poly_degree_ = 0;
+        other.coeff_mod_size_ = 0;
+        other.first_parm_index_ = 0;
+        
+        // 注意：context_data_和其他unique_ptr成员已经在移动过程中被清空
+    }
+
+    // 移动赋值运算符
+    PhantomContext& PhantomContext::operator=(PhantomContext&& other) noexcept {
+        if (this != &other) {
+            // 释放当前对象的资源（如果有的话）
+            // 这里假设我们不需要特别的清理，因为使用的是智能指针
+
+            // 移动资源
+            using_keyswitching_ = other.using_keyswitching_;
+            mul_tech_ = other.mul_tech_;
+            poly_degree_ = other.poly_degree_;
+            coeff_mod_size_ = other.coeff_mod_size_;
+            first_parm_index_ = other.first_parm_index_;
+            context_data_ = std::move(other.context_data_);
+            plain_modulus_ = std::move(other.plain_modulus_);
+            plain_modulus_shoup_ = std::move(other.plain_modulus_shoup_);
+            coeff_div_plain_ = std::move(other.coeff_div_plain_);
+            coeff_div_plain_shoup_ = std::move(other.coeff_div_plain_shoup_);
+            plain_upper_half_increment_ = std::move(other.plain_upper_half_increment_);
+            key_galois_tool_ = std::move(other.key_galois_tool_);
+            
+            // 将other对象重置为默认状态
+            other.using_keyswitching_ = false;
+            other.mul_tech_ = phantom::mul_tech_type::none;
+            other.poly_degree_ = 0;
+            other.coeff_mod_size_ = 0;
+            other.first_parm_index_ = 0;
+            
+            // 注意：other的智能指针成员已经在移动过程中被清空
+        }
+        return *this;
+    }

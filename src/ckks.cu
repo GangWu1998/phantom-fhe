@@ -85,7 +85,44 @@ PhantomCKKSEncoder::PhantomCKKSEncoder(const PhantomContext &context) {
     cudaMemcpyAsync(gpu_ckks_msg_vec_->mul_group(), rotation_group_.data(), slots_half * sizeof(uint32_t),
                     cudaMemcpyHostToDevice, s);
 }
+PhantomCKKSEncoder::PhantomCKKSEncoder(PhantomCKKSEncoder &&source) noexcept {
+    slots_ = source.slots_;
+    sparse_slots_ = source.sparse_slots_;
+    decoding_sparse_slots_ = source.decoding_sparse_slots_;
+    complex_roots_ = std::move(source.complex_roots_);
+    root_powers_ = std::move(source.root_powers_);
+    rotation_group_ = std::move(source.rotation_group_);
+    gpu_ckks_msg_vec_ = std::move(source.gpu_ckks_msg_vec_);
+    first_chain_index_ = source.first_chain_index_;
 
+    // Reset source object
+    source.slots_ = 0;
+    source.sparse_slots_ = 0;
+    source.decoding_sparse_slots_ = 0;
+    source.first_chain_index_ = 1;
+}
+
+PhantomCKKSEncoder& PhantomCKKSEncoder::operator=(PhantomCKKSEncoder &&assign) noexcept {
+    if (this != &assign) {
+        slots_ = assign.slots_;
+        sparse_slots_ = assign.sparse_slots_;
+        decoding_sparse_slots_ = assign.decoding_sparse_slots_;
+        complex_roots_ = std::move(assign.complex_roots_);
+        root_powers_ = std::move(assign.root_powers_);
+        rotation_group_ = std::move(assign.rotation_group_);
+        gpu_ckks_msg_vec_ = std::move(assign.gpu_ckks_msg_vec_);
+        first_chain_index_ = assign.first_chain_index_;
+
+        // Reset source object
+        assign.slots_ = 0;
+        assign.sparse_slots_ = 0;
+        assign.decoding_sparse_slots_ = 0;
+        assign.first_chain_index_ = 1;
+    }
+    return *this;
+}
+
+// ...existing code...
 void PhantomCKKSEncoder::encode_internal(const PhantomContext &context, const cuDoubleComplex *values,
                                          size_t values_size, size_t chain_index, double scale,
                                          PhantomPlaintext &destination, const cudaStream_t &stream) {

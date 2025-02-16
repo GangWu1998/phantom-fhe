@@ -74,11 +74,11 @@ public:
 
     PhantomCKKSEncoder(const PhantomCKKSEncoder &copy) = delete;
 
-    PhantomCKKSEncoder(PhantomCKKSEncoder &&source) = delete;
+    PhantomCKKSEncoder(PhantomCKKSEncoder &&source) noexcept;
 
     PhantomCKKSEncoder &operator=(const PhantomCKKSEncoder &assign) = delete;
 
-    PhantomCKKSEncoder &operator=(PhantomCKKSEncoder &&assign) = delete;
+    PhantomCKKSEncoder &operator=(PhantomCKKSEncoder &&assign) noexcept;
 
     ~PhantomCKKSEncoder() = default;
 

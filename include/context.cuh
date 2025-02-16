@@ -167,6 +167,9 @@ public:
 
     void operator=(const PhantomContext &) = delete;
 
+    PhantomContext& operator=(PhantomContext&& other) noexcept;
+    PhantomContext(PhantomContext&& other) noexcept ;
+
     ~PhantomContext() = default;
 
     /**
