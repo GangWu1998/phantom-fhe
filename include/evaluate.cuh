@@ -277,6 +277,11 @@ inline auto rotate_vector(const PhantomContext &context, const PhantomCiphertext
     return destination;
 }
 
+void rotate_inplace(const PhantomContext &context, PhantomCiphertext &encrypted, int steps,
+    const PhantomGaloisKey &galois_key, 
+    const phantom::util::cuda_stream_wrapper &stream_wrapper = *phantom::util::global_variables::default_stream,
+    bool is_column_rotation = false);
+
 void complex_conjugate_inplace(const PhantomContext &context, PhantomCiphertext &encrypted,
                                const PhantomGaloisKey &galois_key,
                                const phantom::util::cuda_stream_wrapper &stream_wrapper = *phantom::util::global_variables::default_stream);

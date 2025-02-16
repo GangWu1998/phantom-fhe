@@ -122,7 +122,6 @@ PhantomCKKSEncoder& PhantomCKKSEncoder::operator=(PhantomCKKSEncoder &&assign) n
     return *this;
 }
 
-// ...existing code...
 void PhantomCKKSEncoder::encode_internal(const PhantomContext &context, const cuDoubleComplex *values,
                                          size_t values_size, size_t chain_index, double scale,
                                          PhantomPlaintext &destination, const cudaStream_t &stream) {

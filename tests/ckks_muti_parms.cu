@@ -181,6 +181,33 @@ TEST_P(PhantomCKKSParameterizedTest, HomomorphicMultiplicationTest) {
     }
 }
 
+TEST_P(PhantomCKKSParameterizedTest, RotationTest) {
+    std::vector<cuDoubleComplex> input(encoder->slot_count());
+    for (size_t i = 0; i < input.size(); i++) {
+        input[i] = make_cuDoubleComplex((double)i, 0.0);
+    }
+    
+    PhantomPlaintext plain, result_plain;
+    encoder->encode(*context, input, scale, plain);
+    
+    PhantomCiphertext cipher;
+    public_key->encrypt_asymmetric(*context, plain, cipher);
+    
+    int rotation_steps = 3;
+    rotate_inplace(*context, cipher, rotation_steps, *galois_keys);
+    
+    secret_key->decrypt(*context, cipher, result_plain);
+    
+    std::vector<cuDoubleComplex> output;
+    encoder->decode(*context, result_plain, output);
+    
+    ASSERT_EQ(input.size(), output.size());
+    for (size_t i = 0; i < input.size(); i++) {
+        size_t expected_index = (i + rotation_steps) % input.size();
+        EXPECT_NEAR(input[expected_index].x, output[i].x, EPSILON);
+        EXPECT_NEAR(input[expected_index].y, output[i].y, EPSILON);
+    }
+}
 
 
 INSTANTIATE_TEST_CASE_P(
