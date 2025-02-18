@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define SWITCH_POINT 2048
 #define MAX_THREAD_PER_BLOCK 1024
@@ -46,3 +48,4 @@ namespace phantom {
         __device__ __constant__ constexpr int bits_per_uint64_dev = bytes_per_uint64_dev * bits_per_byte_dev;
     }
 }
+

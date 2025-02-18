@@ -45,7 +45,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include ${NTL_INCLUDE_DIR} ${GMP_INCLUDE
 file(GLOB_RECURSE PHANTOM_SOURCES "src/*.cu")
 
 # Main Phantom library
-add_library(Phantom SHARED ${PHANTOM_SOURCES})
+add_library(Phantom STATIC ${PHANTOM_SOURCES})
 
 target_compile_options(Phantom PRIVATE 
     "$<$<AND:$<CONFIG:Debug>,$<COMPILE_LANGUAGE:CUDA>>:-G;-src-in-ptx>"

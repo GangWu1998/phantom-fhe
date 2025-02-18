@@ -125,7 +125,9 @@ PhantomCKKSEncoder& PhantomCKKSEncoder::operator=(PhantomCKKSEncoder &&assign) n
 void PhantomCKKSEncoder::encode_internal(const PhantomContext &context, const cuDoubleComplex *values,
                                          size_t values_size, size_t chain_index, double scale,
                                          PhantomPlaintext &destination, const cudaStream_t &stream) {
-    auto &context_data = context.get_context_data(chain_index);
+    
+    
+                                            auto &context_data = context.get_context_data(chain_index);
     auto &parms = context_data.parms();
     auto &coeff_modulus = parms.coeff_modulus();
     auto &rns_tool = context_data.gpu_rns_tool();

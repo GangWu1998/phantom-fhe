@@ -851,6 +851,7 @@ void rotate_inplace(const PhantomContext &context, PhantomCiphertext &encrypted,
     rotate_internal(context, encrypted, step, galois_key, stream_wrapper);
 }
 
+
 void complex_conjugate_inplace(const PhantomContext &context, PhantomCiphertext &encrypted,
                                const PhantomGaloisKey &galois_key,
                                const phantom::util::cuda_stream_wrapper &stream_wrapper)
