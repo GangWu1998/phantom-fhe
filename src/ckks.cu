@@ -143,6 +143,7 @@ void PhantomCKKSEncoder::encode_internal(const PhantomContext &context, const cu
 
     // Check that scale is positive and not too large
     if (scale <= 0 || (static_cast<int>(log2(scale)) + 1 >= context_data.total_coeff_modulus_bit_count())) {
+        std::cout<<"the scale is "<<scale<<std::endl;
         throw std::invalid_argument("scale out of bounds");
     }
 

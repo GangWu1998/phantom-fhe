@@ -3,7 +3,7 @@
 #include <chrono>
 #include <iostream>
 
-namespace nexus {
+namespace phantom {
 using namespace std;
 using namespace std::chrono;
 
@@ -41,4 +41,4 @@ class Timer {
     return duration_cast<T>(end_ - start_).count() / 1.0;
   }
 };
-}  // namespace nexus
+}  // namespace phantom

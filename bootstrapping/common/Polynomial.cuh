@@ -15,7 +15,6 @@
 using namespace std;
 using namespace NTL;
 using namespace phantom;
-using namespace nexus;
 
 namespace boot {
 class Polynomial {
