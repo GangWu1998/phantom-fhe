@@ -8,3 +8,4 @@
 #include "evaluate.cuh"
 #include "ckks.h"
 #include "util/globals.h"
+#include "boot/ckks_evaluator.cuh"
