@@ -142,11 +142,20 @@ namespace phantom
     {
       ::rescale_to_next_inplace(*context, ct);
     }
+    inline void rescale_to_next(const PhantomCiphertext &ct, PhantomCiphertext &dest)
+    {
+      dest = ::rescale_to_next(*context, ct);
+    }
+    
 
     // Relinearization
     inline void relinearize_inplace(PhantomCiphertext &ct, const PhantomRelinKey &relin_keys)
     {
       ::relinearize_inplace(*context, ct, relin_keys);
+    }
+    inline void relinearize(const PhantomCiphertext &ct, const PhantomRelinKey &relin_keys, PhantomCiphertext &dest)
+    {
+      dest = ::relinearize(*context, ct, relin_keys);
     }
 
     // Multiplication
@@ -160,7 +169,7 @@ namespace phantom
       multiply_inplace(ct, ct);
     }
 
-    inline void multiply(PhantomCiphertext &ct1, const PhantomCiphertext &ct2, PhantomCiphertext &dest)
+    inline void multiply(const PhantomCiphertext &ct1, const PhantomCiphertext &ct2, PhantomCiphertext &dest)
     {
       if (&ct2 == &dest)
       {
@@ -178,28 +187,28 @@ namespace phantom
       ::multiply_inplace(*context, ct1, ct2);
     }
 
-    inline void multiply_plain(PhantomCiphertext &ct, PhantomPlaintext &plain, PhantomCiphertext &dest)
+    inline void multiply_plain(const PhantomCiphertext &ct, const PhantomPlaintext &plain, PhantomCiphertext &dest)
     {
       dest = ::multiply_plain(*context, ct, plain);
     }
 
-    inline void multiply_plain_inplace(PhantomCiphertext &ct, PhantomPlaintext &plain)
+    inline void multiply_plain_inplace(PhantomCiphertext &ct, const PhantomPlaintext &plain)
     {
       ::multiply_plain_inplace(*context, ct, plain);
     }
 
     // Addition
-    inline void add_plain(const PhantomCiphertext &ct, PhantomPlaintext &plain, PhantomCiphertext &dest)
+    inline void add_plain(const PhantomCiphertext &ct, const PhantomPlaintext &plain, PhantomCiphertext &dest)
     {
       dest = ::add_plain(*context, ct, plain);
     }
 
-    inline void add_plain_inplace(PhantomCiphertext &ct, PhantomPlaintext &plain)
+    inline void add_plain_inplace(PhantomCiphertext &ct, const PhantomPlaintext &plain)
     {
       ::add_plain_inplace(*context, ct, plain);
     }
 
-    inline void add(PhantomCiphertext &ct1, const PhantomCiphertext &ct2, PhantomCiphertext &dest)
+    inline void add(const PhantomCiphertext &ct1, const PhantomCiphertext &ct2, PhantomCiphertext &dest)
     {
       dest = ::add(*context, ct1, ct2);
     }
@@ -254,7 +263,7 @@ namespace phantom
     }
 
     // Rotation
-    inline void rotate_vector(PhantomCiphertext &ct, int steps, PhantomGaloisKey &galois_keys, PhantomCiphertext &dest)
+    inline void rotate_vector( PhantomCiphertext &ct, int steps, PhantomGaloisKey &galois_keys, PhantomCiphertext &dest)
     {
       dest = ::rotate(*context, ct, steps, galois_keys);
       cudaStreamSynchronize(ct.data_ptr().get_stream()); // this is currently required, rotation is unstable

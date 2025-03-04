@@ -8,7 +8,7 @@ project(phantom
 
 # Options
 option(PHANTOM_USE_CUDA_PTX "Use CUDA PTX Assembly" ON)
-option(PHANTOM_BUILD_EXAMPLES "Build examples" OFF)
+option(PHANTOM_BUILD_EXAMPLES "Build examples" ON)
 option(PHANTOM_BUILD_TESTS "Build tests" OFF)
 
 if (PHANTOM_USE_CUDA_PTX)
