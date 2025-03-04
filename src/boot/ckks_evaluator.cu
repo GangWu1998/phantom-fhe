@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "ckks_evaluator.cuh"
+#include "boot/ckks_evaluator.cuh"
 #include "phantom.h"
-#include "utils.cuh"
+#include "boot/utils.cuh"
 
 using namespace phantom::arith;
 using namespace phantom::util;

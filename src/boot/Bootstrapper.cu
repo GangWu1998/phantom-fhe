@@ -1,4 +1,4 @@
-#include "Bootstrapper.cuh"
+#include "boot/Bootstrapper.cuh"
 
 Bootstrapper::Bootstrapper(
     long _loge,

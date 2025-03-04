@@ -1,6 +1,6 @@
 #include <NTL/RR.h>
 
-#include "Remez.cuh"
+#include "boot/Remez.cuh"
 
 namespace boot {
 Remez::Remez(RemezParam _params, long _boundary_K, double _log_width, long _deg)

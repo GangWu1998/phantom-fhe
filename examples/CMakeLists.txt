@@ -5,7 +5,7 @@ file(GLOB EXAMPLE_SOURCES "*.cu" "*.cpp")
 foreach(EXAMPLE_SOURCE ${EXAMPLE_SOURCES})
     get_filename_component(EXAMPLE_NAME ${EXAMPLE_SOURCE} NAME_WE)
     add_executable(${EXAMPLE_NAME} ${EXAMPLE_SOURCE})
-    target_link_libraries(${EXAMPLE_NAME} PRIVATE Phantom Boot ${NTL_LIBRARY} ${GMP_LIBRARY} ${GMPXX_LIBRARY})
+    target_link_libraries(${EXAMPLE_NAME} PRIVATE phantom  ${NTL_LIBRARY} ${GMP_LIBRARY} ${GMPXX_LIBRARY})
     
     # 设置CUDA特定的编译选项
     set_target_properties(${EXAMPLE_NAME} PROPERTIES 

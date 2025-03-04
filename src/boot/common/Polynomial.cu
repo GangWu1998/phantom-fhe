@@ -1,4 +1,4 @@
-#include "Polynomial.cuh"
+#include "boot/Polynomial.cuh"
 
 namespace boot {
 Polynomial::Polynomial(long _deg) {

@@ -1,5 +1,5 @@
 // #include "func.h"
-#include "MinicompFunc.cuh"
+#include "boot/MinicompFunc.cuh"
 
 namespace minicomp {
 // [0, q-1) -> (-q/2,q/2]

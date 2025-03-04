@@ -4,10 +4,10 @@
 #include <fstream>
 #include <vector>
 #include <chrono>
-#include "../bootstrapping/common/PolyUpdate.cuh"
+#include "boot/PolyUpdate.cuh"
 #include "cnn_phantom.h"
 #include "phantom.h"
-#include "../bootstrapping/Bootstrapper.cuh"
+#include "boot/Bootstrapper.cuh"
 
 using namespace std;
 using namespace phantom;

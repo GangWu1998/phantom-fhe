@@ -2,7 +2,7 @@
 #include <NTL/RR.h>
 #include <NTL/mat_RR.h>
 
-#include "PolyUpdate.cuh"
+#include "boot/PolyUpdate.cuh"
 
 namespace minicomp {
 // n : odd

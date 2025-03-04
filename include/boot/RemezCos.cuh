@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/Remez.cuh"
+#include "boot/Remez.cuh"
 
 class RemezCos : public boot::Remez {
  public:

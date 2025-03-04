@@ -1,6 +1,6 @@
 #include <random>
 
-#include "../bootstrapping/Bootstrapper.cuh"
+#include "boot/Bootstrapper.cuh"
 #include "phantom.h"
 
 using namespace std;

@@ -1,4 +1,4 @@
-#include "func.cuh"
+#include "boot/func.cuh"
 
 RR fracpart(RR x) {
   return x - round(x);

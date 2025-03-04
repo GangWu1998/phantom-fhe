@@ -1,11 +1,7 @@
 #pragma once
 
-#include "../bootstrapping/common/MinicompFunc.cuh"
-#include "../bootstrapping/common/func.cuh"
-#include "../bootstrapping/common/PolyUpdate.cuh"
+#include "boot.h"
 #include "phantom.h"
-#include "../bootstrapping/Bootstrapper.cuh"
-#include "../bootstrapping/ckks_evaluator.cuh"
 #include <omp.h>
 #include <NTL/RR.h>
 #include <fstream>

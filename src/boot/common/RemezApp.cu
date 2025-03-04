@@ -1,4 +1,4 @@
-#include "RemezApp.cuh"
+#include "boot/RemezApp.cuh"
 
 RR GetError(int d, RR t, bool is_first_function, int type, RR scale) {
   Remez *rm;

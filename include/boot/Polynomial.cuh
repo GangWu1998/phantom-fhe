@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#include "../ckks_evaluator.cuh"
+#include "boot/ckks_evaluator.cuh"
 #include "func.cuh"
 #include "phantom.h"
 

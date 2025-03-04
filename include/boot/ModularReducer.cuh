@@ -5,9 +5,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "RemezArcsin.cuh"
-#include "RemezCos.cuh"
-#include "common/Polynomial.cuh"
+#include "boot/RemezArcsin.cuh"
+#include "boot/RemezCos.cuh"
+#include "boot/Polynomial.cuh"
 
 using namespace std;
 

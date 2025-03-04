@@ -1,4 +1,4 @@
-#include "Choosemax.cuh"
+#include "boot/Choosemax.cuh"
 
 /**************************************************
  * find the index of minimum among c[0] ~ c[num-1]
