@@ -126,37 +126,37 @@ void run_multi_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus
 }
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest1) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest1) {
         run_multi_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest2) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest2) {
         run_multi_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest3) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest3) {
         run_multi_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest4) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest4) {
         run_multi_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest5) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest5) {
         run_multi_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest6) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest6) {
         run_multi_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest7) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest7) {
         run_multi_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest8) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest8) {
         run_multi_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60));
     }
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest9) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest9) {
         run_multi_test(8192, {30, 30, 30, 30}, pow(2.0, 30));
     }
-    TEST(PhantomCKKSBasicOperationsTest, AddOperationTest10) {
+    TEST(PhantomCKKSBasicOperationsTest, MultiOperationTest10) {
         run_multi_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30));
     }
 }
