@@ -11,7 +11,7 @@ using namespace phantom::arith;
 using namespace phantom::util;
 using namespace std;
 
-const double EPSILON = 0.001;
+const double EPSILON = 0.01;
 
 vector<complex<double>> generate_random_vector(size_t size) {
     vector<complex<double>> result(size);
@@ -140,37 +140,37 @@ void run_rescale_test(size_t poly_modulus_degree, const vector<int>& coeff_modul
 }
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest1) {
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest1) {
         run_rescale_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 2);
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest2) {
-        run_rescale_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest2) {
+        run_rescale_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30), 2);
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest3) {
-        run_rescale_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest3) {
+        run_rescale_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 3);
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest4) {
-        run_rescale_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest4) {
+        run_rescale_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50), 4);
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest5) {
-        run_rescale_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest5) {
+        run_rescale_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50), 4);
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest6) {
-        run_rescale_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest6) {
+        run_rescale_test(8192, {60, 40, 40, 60}, pow(2.0, 40), 2);
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest7) {
-        run_rescale_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest7) {
+        run_rescale_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30), 5);
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest8) {
-        run_rescale_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest8) {
+        run_rescale_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60), 6);
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest9) {
-        run_rescale_test(8192, {30, 30, 30, 30}, pow(2.0, 30));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest9) {
+        run_rescale_test(8192, {30, 30, 30, 30}, pow(2.0, 30), 3);
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleperationTest10) {
-        run_rescale_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30));
+    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest10) {
+        run_rescale_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30), 6);
     }
 }

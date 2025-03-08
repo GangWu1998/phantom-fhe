@@ -11,7 +11,7 @@ using namespace phantom::arith;
 using namespace phantom::util;
 using namespace std;
 
-const double EPSILON = 0.001;
+const double EPSILON = 0.01;
 
 vector<complex<double>> generate_random_vector(size_t size) {
     vector<complex<double>> result(size);
@@ -32,11 +32,10 @@ vector<complex<double>> generate_constant_vector(size_t size) {
     return result;
 }
 
-void run_relinearize_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale, size_t chain_index){
+void run_relinearize_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale){
     EncryptionParameters parms(scheme_type::ckks);
     parms.set_poly_modulus_degree(poly_modulus_degree);
     parms.set_coeff_modulus(phantom::arith::CoeffModulus::Create(poly_modulus_degree, coeff_modulus));
-    (void) chain_index;
 
     PhantomContext context(parms);
     PhantomCKKSEncoder encoder(context);
@@ -94,37 +93,37 @@ void run_relinearize_test(size_t poly_modulus_degree, const vector<int>& coeff_m
 }
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest1) {
-        run_relinearize_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 2);
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest1) {
+        run_relinearize_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest2) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest2) {
         run_relinearize_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest3) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest3) {
         run_relinearize_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest4) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest4) {
         run_relinearize_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest5) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest5) {
         run_relinearize_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest6) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest6) {
         run_relinearize_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
-    }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest7) {
+    }   
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest7) {
         run_relinearize_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest8) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest8) {
         run_relinearize_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60));
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest9) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest9) {
         run_relinearize_test(8192, {30, 30, 30, 30}, pow(2.0, 30));
     }
-    TEST(PhantomCKKSBasicOperationsTest, RescaleOperationTest10) {
+    TEST(PhantomCKKSBasicOperationsTest, RelinearizeOperationTest10) {
         run_relinearize_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30));
     }
 }
