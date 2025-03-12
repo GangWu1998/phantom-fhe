@@ -60,37 +60,37 @@ void run_encryption_test(size_t poly_modulus_degree, const vector<int>& coeff_mo
 }
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest1) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest1) {
         run_encryption_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest2) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest2) {
         run_encryption_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest3) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest3) {
         run_encryption_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest4) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest4) {
         run_encryption_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest5) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest5) {
         run_encryption_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest6) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest6) {
         run_encryption_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest7) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest7) {
         run_encryption_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest8) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest8) {
         run_encryption_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60));
     }
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest9) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest9) {
         run_encryption_test(8192, {30, 30, 30, 30}, pow(2.0, 30));
     }
-    TEST(PhantomCKKSBasicOperationsTest, EncryptionperationTest10) {
+    TEST(PhantomCKKSBasicOperationsTest, EncryptionOperationTest10) {
         run_encryption_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30));
     }
 }

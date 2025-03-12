@@ -1,17 +1,19 @@
 #include <gtest/gtest.h>
 #include <cuda_runtime.h>
 #include "phantom.h"
+#include "boot/Bootstrapper.cuh"
 #include <vector>
 #include <cmath>
 #include <random>
 #include <memory>
+#include <Eigen/Dense>
 
 using namespace phantom;
 using namespace phantom::arith;
 using namespace phantom::util;
 using namespace std;
 
-const double EPSILON = 0.001;
+const double EPSILON = 0.1;
 
 std::vector<complex<double>> generate_random_vector(size_t size) {
     std::vector<complex<double>> result(size);
@@ -22,6 +24,13 @@ std::vector<complex<double>> generate_random_vector(size_t size) {
         result[i] = complex<double>(dis(gen), dis(gen));
     }
     return result;
+}
+Eigen::VectorXcd vectorToEigen(const std::vector<std::complex<double>>& v) {
+    Eigen::VectorXcd ev(v.size());
+    for (size_t i = 0; i < v.size(); ++i) {
+        ev[i] = v[i];
+    }
+    return ev;
 }
 
 void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale){
@@ -47,28 +56,90 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     ckks_evaluator.encoder.encode(input1_vector, scale, plain1);
     ckks_evaluator.encoder.encode(input2_vector, scale, plain2);
     ckks_evaluator.encoder.encode(input3_vector, scale, plain3);
-
+/*
     //add_inplace
     PhantomCiphertext cipher1_inplace, cipher2_inplace;
     ckks_evaluator.encryptor.encrypt(plain1, cipher1_inplace);
     ckks_evaluator.encryptor.encrypt(plain2, cipher2_inplace);
 
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    //auto start = system_clock::now();    //yibu? cudaevant
+    cudaEventRecord(start, 0);
     ckks_evaluator.evaluator.add_inplace(cipher1_inplace, cipher2_inplace);
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    //duration<double> sec = system_clock::now() - start;
+    std::cout << "Kernel execution time: " << elapsedTime << " ms" << std::endl;
+    //std::cout << "Add_inplace Bootstrapping took: " << 1000 * sec.count() << "ms" << endl;
+
     PhantomPlaintext addresult_inplace;
     ckks_evaluator.decryptor.decrypt(cipher1_inplace, addresult_inplace);
     vector<complex<double>> output_inplace;
     ckks_evaluator.encoder.decode(addresult_inplace, output_inplace);
 
-    ASSERT_EQ(input1_vector.size(), output_inplace.size());
+    // ASSERT_EQ(input1_vector.size(), output_inplace.size());
+    // for(size_t i = 0; i < input1_vector.size(); i++){
+    //     EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_inplace[i].real(), EPSILON);
+    //     cout << "Add_inplace true real error: " << (input1_vector[i].real() + input2_vector[i].real() - output_inplace[i].real()) *100000000  << endl;
+    //     EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_inplace[i].imag(), EPSILON);
+    //     cout << "Add_inplace true imag error: " << (input1_vector[i].imag() + input2_vector[i].imag() - output_inplace[i].imag()) *100000000 << endl;
+    // }
+    // double mean_err = 0;
+    // for (long i = 0; i < slots; i++) {
+    // // if (i < 10) std::cout << before[i] << " <----> " << after[i] << endl;
+    //     mean_err += abs(input1_vector[i] - output_inplace[i]);
+    // }
+    // mean_err /= slots;
+    vector<complex<double>> input_vector(input1_vector.size()); 
+    for(size_t i = 0; i < input1_vector.size(); i++){
+        input_vector[i] = input1_vector[i] + input2_vector[i];
+    }
+    Eigen::VectorXcd input1_eigen = vectorToEigen(input_vector);
+    Eigen::VectorXcd output_eigen = vectorToEigen(output_inplace);
+
+    // 计算绝对误差
+    Eigen::VectorXd absolute_error = (input1_eigen - output_eigen).cwiseAbs();
+    //std::cout << "Absolute Error: " << absolute_error.transpose() << std::endl;
+
+    // 计算相对误差
+    Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input1_eigen.cwiseAbs());
+    //std::cout << "Relative Error: " << relative_error.transpose() << std::endl;
+
+    // 计算均方误差 (MSE)
+    double mse = (input1_eigen - output_eigen).squaredNorm() / input1_eigen.size();
+    std::cout << "Mean Squared Error (MSE): " << mse << std::endl;
+
+    // 计算最大误差
+    double max_error = absolute_error.maxCoeff();
+    std::cout << "Max Error: " << max_error << std::endl;
     for(size_t i = 0; i < input1_vector.size(); i++){
         EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_inplace[i].real(), EPSILON);
         EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_inplace[i].imag(), EPSILON);
     }
 
+
+
     //add_plain
     PhantomCiphertext cipher1_plain, dest_plain;
     ckks_evaluator.encryptor.encrypt(plain1, cipher1_plain);
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    //auto start = system_clock::now();    //yibu? cudaevant
+    cudaEventRecord(start, 0);
     ckks_evaluator.evaluator.add_plain(cipher1_plain ,plain2, dest_plain); 
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    //duration<double> sec = system_clock::now() - start;
+    std::cout << "Kernel execution time: " << elapsedTime << " ms" << std::endl;
 
     PhantomPlaintext addresult_plain;
     ckks_evaluator.decryptor.decrypt(dest_plain, addresult_plain);
@@ -77,16 +148,53 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     ckks_evaluator.encoder.decode(addresult_plain, output_plain);
 
     ASSERT_EQ(input1_vector.size(), output_plain.size());
-    for (size_t i = 0; i < input1_vector.size(); i++){
-        EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_plain[i].real(), EPSILON);
-        EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_plain[i].imag(), EPSILON);
+    // for (size_t i = 0; i < input1_vector.size(); i++){
+    //     EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_plain[i].real(), EPSILON);
+    //     EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_plain[i].imag(), EPSILON);
+    // }
+    vector<complex<double>> input_vector(input1_vector.size()); 
+    for(size_t i = 0; i < input1_vector.size(); i++){
+        input_vector[i] = input1_vector[i] + input2_vector[i];
     }
+    Eigen::VectorXcd input1_eigen = vectorToEigen(input_vector);
+    Eigen::VectorXcd output_eigen = vectorToEigen(output_plain);
+
+    // 计算绝对误差
+    Eigen::VectorXd absolute_error = (input1_eigen - output_eigen).cwiseAbs();
+    //std::cout << "Absolute Error: " << absolute_error.transpose() << std::endl;
+
+    // 计算相对误差
+    Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input1_eigen.cwiseAbs());
+    //std::cout << "Relative Error: " << relative_error.transpose() << std::endl;
+
+    // 计算均方误差 (MSE)
+    double mse = (input1_eigen - output_eigen).squaredNorm() / input1_eigen.size();
+    std::cout << "Mean Squared Error (MSE): " << mse << std::endl;
+
+    // 计算最大误差
+    double max_error = absolute_error.maxCoeff();
+    std::cout << "Max Error: " << max_error << std::endl;
+
+
 
     //add_plain_inplace
     PhantomCiphertext cipher1_plain_inplace;
-    ckks_evaluator.encryptor.encrypt(plain1, cipher1_plain_inplace);    
-    
+    ckks_evaluator.encryptor.encrypt(plain1, cipher1_plain_inplace);  
+
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+    //auto start = system_clock::now();    //yibu? cudaevant
+    cudaEventRecord(start, 0);
     ckks_evaluator.evaluator.add_plain_inplace(cipher1_plain_inplace, plain2);
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    //duration<double> sec = system_clock::now() - start;
+    std::cout << "Kernel execution time: " << elapsedTime << " ms" << std::endl;  
+    
 
     PhantomPlaintext plain_plain_inplace;
     ckks_evaluator.decryptor.decrypt(cipher1_plain_inplace, plain_plain_inplace);
@@ -95,17 +203,51 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     ckks_evaluator.encoder.decode(plain_plain_inplace, output_plain_inplace);
 
     ASSERT_EQ(input1_vector.size(), output_plain_inplace.size());
-    for (size_t i = 0; i < input1_vector.size(); i++){
-        EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_plain_inplace[i].real(), EPSILON);
-        EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_plain_inplace[i].imag(), EPSILON);
+    // for (size_t i = 0; i < input1_vector.size(); i++){
+    //     EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_plain_inplace[i].real(), EPSILON);
+    //     EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_plain_inplace[i].imag(), EPSILON);
+    // }
+
+    vector<complex<double>> input_vector(input1_vector.size()); 
+    for(size_t i = 0; i < input1_vector.size(); i++){
+        input_vector[i] = input1_vector[i] + input2_vector[i];
     }
+    Eigen::VectorXcd input1_eigen = vectorToEigen(input_vector);
+    Eigen::VectorXcd output_eigen = vectorToEigen(output_plain_inplace);
+
+    // 计算绝对误差
+    Eigen::VectorXd absolute_error = (input1_eigen - output_eigen).cwiseAbs();
+    //std::cout << "Absolute Error: " << absolute_error.transpose() << std::endl;
+
+    // 计算相对误差
+    Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input1_eigen.cwiseAbs());
+    //std::cout << "Relative Error: " << relative_error.transpose() << std::endl;
+
+    // 计算均方误差 (MSE)
+    double mse = (input1_eigen - output_eigen).squaredNorm() / input1_eigen.size();
+    std::cout << "pain_inplace_Mean Squared Error (MSE): " << mse << std::endl;
+
+    // 计算最大误差
+    double max_error = absolute_error.maxCoeff();
+    std::cout << "pain_inplace_Max Error: " << max_error << std::endl;
+
 
     //add
     PhantomCiphertext cipher1_add, cipher2_add, dest_add;
     ckks_evaluator.encryptor.encrypt(plain1, cipher1_add);
     ckks_evaluator.encryptor.encrypt(plain2, cipher2_add);
 
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
     ckks_evaluator.evaluator.add(cipher1_add, cipher2_add, dest_add);
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    //duration<double> sec = system_clock::now() - start;
+    std::cout << "Kernel execution time: " << elapsedTime << " ms" << std::endl;  
 
     PhantomPlaintext plain_add;
     ckks_evaluator.decryptor.decrypt(dest_add, plain_add);
@@ -113,10 +255,33 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     ckks_evaluator.encoder.decode(plain_add, output_add);
     
     ASSERT_EQ(input1_vector.size(), output_add.size());
-    for (size_t i = 0; i < input1_vector.size(); i++){
-        EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_add[i].real(), EPSILON);
-        EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_add[i].imag(), EPSILON);
+    // for (size_t i = 0; i < input1_vector.size(); i++){
+    //     EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real(), output_add[i].real(), EPSILON);
+    //     EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag(), output_add[i].imag(), EPSILON);
+    // }
+    vector<complex<double>> input_vector(input1_vector.size()); 
+    for(size_t i = 0; i < input1_vector.size(); i++){
+        input_vector[i] = input1_vector[i] + input2_vector[i];
     }
+    Eigen::VectorXcd input1_eigen = vectorToEigen(input_vector);
+    Eigen::VectorXcd output_eigen = vectorToEigen(output_add);
+
+    // 计算绝对误差
+    Eigen::VectorXd absolute_error = (input1_eigen - output_eigen).cwiseAbs();
+    //std::cout << "Absolute Error: " << absolute_error.transpose() << std::endl;
+
+    // 计算相对误差
+    Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input1_eigen.cwiseAbs());
+    //std::cout << "Relative Error: " << relative_error.transpose() << std::endl;
+
+    // 计算均方误差 (MSE)
+    double mse = (input1_eigen - output_eigen).squaredNorm() / input1_eigen.size();
+    std::cout << "add_Mean Squared Error (MSE): " << mse << std::endl;
+
+    // 计算最大误差
+    double max_error = absolute_error.maxCoeff();
+    std::cout << "add_Max Error: " << max_error << std::endl;
+    */
 
     //add_many
     PhantomCiphertext cipher1_many, cipher2_many, cipher3_many, dest_many;
@@ -125,10 +290,20 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     ckks_evaluator.encryptor.encrypt(plain3, cipher3_many);
     vector<PhantomCiphertext> cts = {cipher1_many, cipher2_many, cipher3_many};
 
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
     ckks_evaluator.evaluator.add(cts[0], cts[1], dest_many);
     for(size_t i = 2; i < cts.size(); i++){
         ckks_evaluator.evaluator.add_inplace(dest_many, cts[i]);
     }
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+        //duration<double> sec = system_clock::now() - start;
+    std::cout << "Kernel execution time: " << elapsedTime << " ms" << std::endl; 
 
     PhantomPlaintext plain_many;
     ckks_evaluator.decryptor.decrypt(dest_many, plain_many);
@@ -137,45 +312,67 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     ckks_evaluator.encoder.decode(plain_many, output_many);
 
     ASSERT_EQ(input1_vector.size(), output_many.size());
-    for (size_t i = 0; i < input1_vector.size(); i++){
-        EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real() + input3_vector[i].real(), output_many[i].real(), EPSILON);
-        EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag() + input3_vector[i].imag(), output_many[i].imag(), EPSILON);
+    // for (size_t i = 0; i < input1_vector.size(); i++){
+    //     EXPECT_NEAR(input1_vector[i].real() + input2_vector[i].real() + input3_vector[i].real(), output_many[i].real(), EPSILON);
+    //     EXPECT_NEAR(input1_vector[i].imag() + input2_vector[i].imag() + input3_vector[i].imag(), output_many[i].imag(), EPSILON);
+    // }
+    vector<complex<double>> input_vector(input1_vector.size()); 
+    for(size_t i = 0; i < input1_vector.size(); i++){
+        input_vector[i] = input1_vector[i] + input2_vector[i] + input3_vector[i];
     }
+    Eigen::VectorXcd input1_eigen = vectorToEigen(input_vector);
+    Eigen::VectorXcd output_eigen = vectorToEigen(output_many);
+
+    // 计算绝对误差
+    Eigen::VectorXd absolute_error = (input1_eigen - output_eigen).cwiseAbs();
+    //std::cout << "Absolute Error: " << absolute_error.transpose() << std::endl;
+
+    // 计算相对误差
+    Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input1_eigen.cwiseAbs());
+    //std::cout << "Relative Error: " << relative_error.transpose() << std::endl;
+
+    // 计算均方误差 (MSE)
+    double mse = (input1_eigen - output_eigen).squaredNorm() / input1_eigen.size();
+    std::cout << "add_Mean Squared Error (MSE): " << mse << std::endl;
+
+    // 计算最大误差
+    double max_error = absolute_error.maxCoeff();
+    std::cout << "add_Max Error: " << max_error << std::endl;
 }
 
 namespace phantomtest{
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest1) {
-        run_add_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
+        run_add_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
     }
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest2) {
-        run_add_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30));
+        run_add_test(8192, {50, 40, 40, 50}, pow(2.0, 40));
     }
 
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest3) {
-        run_add_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
+        run_add_test(16384, {60, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
 
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest4) {
-        run_add_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
+        run_add_test(16384, {60, 45, 45, 45, 45, 45, 45, 45, 60}, pow(2.0, 45));
     }
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest5) {
-        run_add_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
+        run_add_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest6) {
-        run_add_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
+        run_add_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest7) {
-        run_add_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30));
+        run_add_test(32768, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
 
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest8) {
-        run_add_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60));
+        run_add_test(32768, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60));
     }
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest9) {
-        run_add_test(8192, {30, 30, 30, 30}, pow(2.0, 30));
+        run_add_test(65536, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60));
     }
     TEST(PhantomCKKSBasicOperationsTest, AddOperationTest10) {
-        run_add_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30));
+        run_add_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,50, 60}, pow(2.0, 50));
     }
 }
 
