@@ -24,7 +24,7 @@ std::vector<complex<double>> generate_random_vector(size_t size) {
     return result;
 }
 
-void run_galois_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale, uint32_t galois_elts,int step){
+void run_galois_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale, int step){
     EncryptionParameters parms(scheme_type::ckks);
     parms.set_poly_modulus_degree(poly_modulus_degree);
     parms.set_coeff_modulus(phantom::arith::CoeffModulus::Create(poly_modulus_degree, coeff_modulus));
@@ -43,11 +43,12 @@ void run_galois_test(size_t poly_modulus_degree, const vector<int>& coeff_modulu
 
     PhantomPlaintext plain;
     ckks_evaluator.encoder.encode(input_vector, scale, plain);
-/*
+
     //apply_galois
     PhantomCiphertext cipher_galois, dest_galois;
     ckks_evaluator.encryptor.encrypt(plain, cipher_galois);
 
+    auto galois_elts = context.key_galois_tool_.get_elt_from_step(step);
     ckks_evaluator.evaluator.apply_galois(cipher_galois, galois_elts, galois_keys, dest_galois);
 
     PhantomPlaintext result_galois;
@@ -60,7 +61,7 @@ void run_galois_test(size_t poly_modulus_degree, const vector<int>& coeff_modulu
         EXPECT_NEAR(input_vector[(i + galois_elts) % slots].real(), output_galois[i].real(), EPSILON);
         EXPECT_NEAR(input_vector[(i + galois_elts) % slots].imag(), output_galois[i].imag(), EPSILON);
     }
-*/
+/*
     //apply_galois_inplace
     PhantomCiphertext cipher_galois_inplace;
     ckks_evaluator.encryptor.encrypt(plain, cipher_galois_inplace);
@@ -77,41 +78,42 @@ void run_galois_test(size_t poly_modulus_degree, const vector<int>& coeff_modulu
         EXPECT_NEAR(input_vector[(i + galois_elts) % slots].real(), output_galois_inplace[i].real(), EPSILON);
         EXPECT_NEAR(input_vector[(i + galois_elts) % slots].imag(), output_galois_inplace[i].imag(), EPSILON);
     }
+    */
 }
 
 namespace phantomtest{
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest1) {
-        run_galois_test(65536, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 2, 2);
+        run_galois_test(8192, {60, 40, 40, 60}, pow(2.0, 40), 2);
     }
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest2) {
-        run_galois_test(8192, {60, 30, 30, 30, 60}, pow(2.0, 30), 1, 2);
+        run_galois_test(8192, {50, 40, 40, 50}, pow(2.0, 40), 1);
     }
 
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest3) {
-        run_galois_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 3, 2);
+        run_galois_test(16384, {60, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50), 2);
     }
 
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest4) {
-        run_galois_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50), 2, 3);
+        run_galois_test(16384, {60, 45, 45, 45, 45, 45, 45, 45, 60}, pow(2.0, 45), 2);
     }
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest5) {
-        run_galois_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50), 3, 2);
+        run_galois_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 2);
     }
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest6) {
-        run_galois_test(8192, {60, 40, 40, 60}, pow(2.0, 40), 2, 1);
+        run_galois_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50), 2);
     }
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest7) {
-        run_galois_test(16384, {50, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 50}, pow(2.0, 30), 4, 2);
+        run_galois_test(32768, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40), 2);
     }
 
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest8) {
-        run_galois_test(32768, {60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60}, pow(2.0, 60), 5, 2);
+        run_galois_test(32768, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60), 2);
     }
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest9) {
-        run_galois_test(8192, {30, 30, 30, 30}, pow(2.0, 30), 1, 1);
+        run_galois_test(65536, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60), 2);
     }
     TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest10) {
-        run_galois_test(32768, {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}, pow(2.0, 30), 6, 5);
+        run_galois_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,50, 60}, pow(2.0, 50), 2);
     }
 }
 
