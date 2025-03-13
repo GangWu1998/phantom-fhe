@@ -48,7 +48,7 @@ void run_relinearize_test(size_t poly_modulus_degree, const vector<int>& coeff_m
 
     int slots = ckks_evaluator.encoder.slot_count();
     vector<complex<double>> input1_vector = generate_random_vector(slots);
-    vector<complex<double>> input2_vector = generate_constant_vector(slots);
+    vector<complex<double>> input2_vector = generate_random_vector(slots);
 
     PhantomPlaintext plain1, plain2;
     ckks_evaluator.encoder.encode(input1_vector, scale, plain1);
