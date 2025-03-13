@@ -34,10 +34,11 @@ void run_rotation_test(size_t poly_modulus_degree, const vector<int>& coeff_modu
 
     PhantomContext context(parms);
     PhantomCKKSEncoder encoder(context);
-    PhantomSecretKey secret_key(context);
+    PhantomSecretKey secret_key(context);     
     PhantomPublicKey public_key = secret_key.gen_publickey(context);
     PhantomRelinKey relin_keys = secret_key.gen_relinkey(context);
-    PhantomGaloisKey galois_keys = secret_key.create_galois_keys(context);
+    PhantomGaloisKey galois_keys = secret_key.create_galois_keys_from_steps(context, );
+    //PhantomGaloisKey galois_keys = secret_key.create_galois_keys(context);
 
     CKKSEvaluator ckks_evaluator(&context, &public_key, &secret_key, &encoder, &relin_keys, &galois_keys, scale);
 
