@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import subprocess
 import time
 import psutil
@@ -6,13 +7,14 @@ def is_gpu_idle(threshold=10):
     try:
         result = subprocess.run(['nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'], stdout=subprocess.PIPE)
         gpu_usages = result.stdout.decode('utf-8').strip().split('\n')
-        for usage in gpu_usages:
-            if float(usage) >= threshold:
-                return False
-        return True
+        for i, usage in enumerate(gpu_usages):
+            if float(usage) < threshold:
+                print(f"GPU {i} is idle with usage {usage}%.")
+                return i  
+        return None  
     except Exception as e:
         print(f"Failed to get GPU usage: {e}")
-        return False
+        return None
 
 def run_tests(test_commands, output_file):
     for command in test_commands:
@@ -29,8 +31,10 @@ def run_tests(test_commands, output_file):
 
 def main():
     test_groups = [
-        (['./add_inplace', './add_plain', './add_plain_inplace', './add', 'add_many'], 'add_op.txt')
-        #(['./test_executable_3', './test_executable_4'], 'test_results_group_2.txt'),
+        (['./add_inplace', './add_plain', './add_plain_inplace', './add', './add_many'], 'add_op.txt'),
+        (['./sub_inplace', './sub_plain', './sub_plain_inplace', './sub'], 'sub_op.txt'),
+        (['./multi_inplace', './multi_plain', './multi_plain_inplace', './multi'], 'multi_op.txt'),
+        (['./negation_inplace', './negation_inplace'], 'negation_op.txt')
     ]
 
     while True:
