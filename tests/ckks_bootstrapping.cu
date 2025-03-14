@@ -26,6 +26,7 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
                             long loge, long logn, long sparse_slots, int logp, int logq, int log_special_prime,
                             int secret_key_hamming_weight, int remaining_level, int boot_level, int total_level
                             ){
+    
     sparse_slots = (1 << logn);      
     total_level = remaining_level + boot_level;   
     vector<int> coeff_bit_vec;
