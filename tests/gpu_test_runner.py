@@ -7,14 +7,16 @@ def is_gpu_idle(threshold=10):
     try:
         result = subprocess.run(['nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'], stdout=subprocess.PIPE)
         gpu_usages = result.stdout.decode('utf-8').strip().split('\n')
-        for i, usage in enumerate(gpu_usages):
-            if float(usage) < threshold:
-                print(f"GPU {i} is idle with usage {usage}%.")
-                return i  
-        return None  
+        
+        if len(gpu_usages) > 0:
+            usage = float(gpu_usages[0]) 
+            if usage < threshold:
+                print(f"GPU 0 is idle with usage {usage}%.")
+                return True
+        return False
     except Exception as e:
         print(f"Failed to get GPU usage: {e}")
-        return None
+        return False 
 
 def run_tests(test_commands, output_file):
     for command in test_commands:
@@ -34,7 +36,14 @@ def main():
         (['./add_inplace', './add_plain', './add_plain_inplace', './add', './add_many'], 'add_op.txt'),
         (['./sub_inplace', './sub_plain', './sub_plain_inplace', './sub'], 'sub_op.txt'),
         (['./multi_inplace', './multi_plain', './multi_plain_inplace', './multi'], 'multi_op.txt'),
-        (['./negation_inplace', './negation_inplace'], 'negation_op.txt')
+        (['./encryption', './decryption'], 'encryption_op.txt'),
+        (['./galois_inplace', './galois'], 'galois_op.txt'),
+        (['./negation_inplace', './negation_inplace'], 'negation_op.txt'),
+        (['./relin_inplace', './relin'], 'relin_op.txt'),
+        (['./rescale_to_next_inplace', './rescale_to_next'], 'rescale_op.txt'),
+        (['./rotation'], 'rotation_op.txt'),
+        (['./conjugate', './conjugate_inplace'], 'conjugate_op.txt'),
+        (['./encode', './decode'], 'encode_op.txt')
     ]
 
     while True:

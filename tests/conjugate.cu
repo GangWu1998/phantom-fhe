@@ -33,7 +33,7 @@ Eigen::VectorXcd vectorToEigen(const std::vector<std::complex<double>>& v) {
     return ev;
 }
 
-void run_negation_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale){
+void run_conjugate_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, double scale){
     EncryptionParameters parms(scheme_type::ckks);
     parms.set_poly_modulus_degree(poly_modulus_degree);
     parms.set_coeff_modulus(phantom::arith::CoeffModulus::Create(poly_modulus_degree, coeff_modulus));
@@ -56,14 +56,14 @@ void run_negation_test(size_t poly_modulus_degree, const vector<int>& coeff_modu
     PhantomCiphertext cipher;
     ckks_evaluator.encryptor.encrypt(plain, cipher);
 
-    //Negation
-    PhantomCiphertext dest_negate;
+    //conjugate
+    PhantomCiphertext dest_conjugate;
 
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
-    ckks_evaluator.evaluator.negate(cipher, dest_negate);
+    ckks_evaluator.evaluator.complex_conjugate(cipher, galois_keys, dest_conjugate);
     cudaEventRecord(stop, 0);
     cudaEventSynchronize(stop);
     float elapsedTime;
@@ -71,19 +71,19 @@ void run_negation_test(size_t poly_modulus_degree, const vector<int>& coeff_modu
     //duration<double> sec = system_clock::now() - start;
     std::cout << "Sub Kernel execution time: " << elapsedTime * 1000 << " us" << std::endl;  
 
-    PhantomPlaintext result_negate;
-    ckks_evaluator.decryptor.decrypt(dest_negate, result_negate);
-    vector<complex<double>> output_negate;
-    ckks_evaluator.encoder.decode(result_negate, output_negate);
+    PhantomPlaintext result_conjugate;
+    ckks_evaluator.decryptor.decrypt(dest_conjugate, result_conjugate);
+    vector<complex<double>> output_conjugate;
+    ckks_evaluator.encoder.decode(result_conjugate, output_conjugate);
     
-    ASSERT_EQ(input_vector.size(), output_negate.size());
+    ASSERT_EQ(input_vector.size(), output_conjugate.size());
     vector<complex<double>> eigen_input_vector(input_vector.size()); 
     for(size_t i = 0; i < input_vector.size(); i++){
-        eigen_input_vector[i].real(-1.0 * input_vector[i].real());
-        eigen_input_vector[i].imag(-1.0 * input_vector[i].imag());
+        eigen_input_vector[i].real( input_vector[i].real());
+        eigen_input_vector[i].imag(-input_vector[i].imag());
     }
     Eigen::VectorXcd input1_eigen = vectorToEigen(eigen_input_vector);
-    Eigen::VectorXcd output_eigen = vectorToEigen(output_negate);
+    Eigen::VectorXcd output_eigen = vectorToEigen(output_conjugate);
     Eigen::VectorXd absolute_error = (input1_eigen - output_eigen).cwiseAbs();
     Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input1_eigen.cwiseAbs());
  
@@ -97,37 +97,37 @@ void run_negation_test(size_t poly_modulus_degree, const vector<int>& coeff_modu
 
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, NegationOperationTest1) {
-        run_negation_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest1) {
+        run_conjugate_test(8192, {60, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest2) {
-        run_negation_test(8192, {50, 40, 40, 50}, pow(2.0, 40));
-    }
-
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest3) {
-        run_negation_test(16384, {60, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest2) {
+        run_conjugate_test(8192, {50, 40, 40, 50}, pow(2.0, 40));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest4) {
-        run_negation_test(16384, {60, 45, 45, 45, 45, 45, 45, 45, 60}, pow(2.0, 45));
-    }
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest5) {
-        run_negation_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
-    }
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest6) {
-        run_negation_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
-    }
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest7) {
-        run_negation_test(32768, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest3) {
+        run_conjugate_test(16384, {60, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
     }
 
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest8) {
-        run_negation_test(32768, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60));
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest4) {
+        run_conjugate_test(16384, {60, 45, 45, 45, 45, 45, 45, 45, 60}, pow(2.0, 45));
     }
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest9) {
-        run_negation_test(65536, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60));
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest5) {
+        run_conjugate_test(16384, {60, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
     }
-    TEST(PhantomCKKSBasicOperationsTest, GaloisOperationTest10) {
-        run_negation_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,50, 60}, pow(2.0, 50));
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest6) {
+        run_conjugate_test(32768, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 60}, pow(2.0, 50));
+    }
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest7) {
+        run_conjugate_test(32768, {60, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 60}, pow(2.0, 40));
+    }
+
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest8) {
+        run_conjugate_test(32768, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60));
+    }
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest9) {
+        run_conjugate_test(65536, {60, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 55, 60}, pow(2.0, 60));
+    }
+    TEST(PhantomCKKSBasicOperationsTest, ConjugateOperationTest10) {
+        run_conjugate_test(65536, {60, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,50, 60}, pow(2.0, 50));
     }
 }
