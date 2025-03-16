@@ -23,11 +23,23 @@ void random_real(vector<double> &vec, size_t size) {
 }
 
 void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long inverse_deg, long logN,
-                            long loge, long logn, long sparse_slots, int logp, int logq, int log_special_prime,
-                            int secret_key_hamming_weight, int remaining_level, int boot_level, int total_level
+                            long loge, long logn, long sparse_slots, int logp, int logq,
+                            int remaining_level, int boot_level, int total_level
                             ){
+    long boundary_K = 25;
+    long deg = 59;
+    long scale_factor = 2;
+    long inverse_deg = 1;
+
+    long logN = 16;  // 16 -> 15
+    long loge = 10;
+
+    long logn = 15;  // 14 -> 13
+    long sparse_slots = (1 << logn);
+    int log_special_prime = 51;
+
+    int secret_key_hamming_weight =192;
     
-    sparse_slots = (1 << logn);      
     total_level = remaining_level + boot_level;   
     vector<int> coeff_bit_vec;
     coeff_bit_vec.push_back(logq);
@@ -81,7 +93,7 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
     vector<int> gal_steps_vector;
     gal_steps_vector.push_back(0);
     for(int i = 0; i < logN - 1; i++){
-        gal_steps_vector.push_back((1 << i));
+        gal_steps_vector.push_back((1 << i));                     
     }
     bootstrapper.addLeftRotKeys_Linear_to_vector_3(gal_steps_vector);
 
@@ -140,6 +152,6 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
 
 namespace phantomtest{
     TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest1){
-        run_bootstrapping_test(25, 59, 2, 1, 16, 10, 15, 0, 46, 51, 51, 192, 16, 14, 0);
+        run_bootstrapping_test(25, 59, 2, 1, 16, 10, 15, 0, 46, 51, 16, 14, 0);
     }
 }

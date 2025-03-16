@@ -3,7 +3,7 @@ import subprocess
 import time
 import psutil
 
-def is_gpu_idle(threshold=10):
+def is_gpu_idle(threshold=15):
     try:
         result = subprocess.run(['nvidia-smi', '--query-gpu=utilization.gpu', '--format=csv,noheader,nounits'], stdout=subprocess.PIPE)
         gpu_usages = result.stdout.decode('utf-8').strip().split('\n')
@@ -37,24 +37,29 @@ def main():
         (['./sub_inplace', './sub_plain', './sub_plain_inplace', './sub'], 'sub_op.txt'),
         (['./multi_inplace', './multi_plain', './multi_plain_inplace', './multi'], 'multi_op.txt'),
         (['./encryption', './decryption'], 'encryption_op.txt'),
-        (['./galois_inplace', './galois'], 'galois_op.txt'),
+        (['./apply_galois_inplace', './apply_galois'], 'galois_op.txt'),
         (['./negation_inplace', './negation_inplace'], 'negation_op.txt'),
         (['./relin_inplace', './relin'], 'relin_op.txt'),
         (['./rescale_to_next_inplace', './rescale_to_next'], 'rescale_op.txt'),
         (['./rotation'], 'rotation_op.txt'),
         (['./conjugate', './conjugate_inplace'], 'conjugate_op.txt'),
-        (['./encode', './decode'], 'encode_op.txt')
+        (['./encode', './decode'], 'encode_op.txt'),
+        (['./bootstrapping_text'], 'bootstrapping_op.txt')
     ]
 
-    while True:
+    execution_count = 0
+    max_executions = 5
+
+    while execution_count < max_executions:
         if is_gpu_idle():
             print("GPU is idle, running tests...")
             for test_commands, output_file in test_groups:
                 run_tests(test_commands, output_file)
-            break
+            execution_count += 1
+            print(f"Completed execution {execution_count}/{max_executions}")
         else:
             print("GPU is busy, waiting...")
-        
+
         time.sleep(60)
 
 if __name__ == '__main__':
