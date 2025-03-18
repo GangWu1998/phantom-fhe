@@ -6,6 +6,7 @@
 #include <cmath>
 #include <random>
 #include <memory>
+#include <Eigen/Dense>
 
 using namespace phantom;
 using namespace std;
@@ -22,25 +23,26 @@ void random_real(vector<double> &vec, size_t size) {
   }
 }
 
-void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long inverse_deg, long logN,
-                            long loge, long logn, long sparse_slots, int logp, int logq,
-                            int remaining_level, int boot_level, int total_level
-                            ){
+Eigen::VectorXcd vectorToEigen(const std::vector<double>& v) {
+    Eigen::VectorXcd ev(v.size());
+    for (size_t i = 0; i < v.size(); ++i) {
+        ev[i] = v[i];
+    }
+    return ev;
+}
+
+void run_bootstrapping_test(long logN, long logn, int logp, int logq, int remaining_level, int boot_level){
     long boundary_K = 25;
     long deg = 59;
     long scale_factor = 2;
     long inverse_deg = 1;
-
-    long logN = 16;  // 16 -> 15
     long loge = 10;
 
-    long logn = 15;  // 14 -> 13
     long sparse_slots = (1 << logn);
     int log_special_prime = 51;
-
     int secret_key_hamming_weight =192;
     
-    total_level = remaining_level + boot_level;   
+    int total_level = remaining_level + boot_level;   
     vector<int> coeff_bit_vec;
     coeff_bit_vec.push_back(logq);
     for(int i = 0; i < remaining_level; i++){
@@ -51,7 +53,7 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
     }
     coeff_bit_vec.push_back(log_special_prime);
 
-    std::cout << "Setting Parameters..." << endl;
+    //std::cout << "Setting Parameters..." << endl;
     phantom::EncryptionParameters parms(scheme_type::ckks);
     size_t poly_modulus_degree = (size_t)(1 << logN);
     double scale = pow(2.0, logp);
@@ -86,10 +88,10 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
         inverse_deg,
         &ckks_evaluator);
     
-    std::cout << "Generating Optimal Minimax Polynimials..." << endl;
+    //std::cout << "Generating Optimal Minimax Polynimials..." << endl;
     bootstrapper.prepare_mod_polynomial();
 
-    std::cout << "Adding Bootstrapping Keys..."  <<endl;
+    //std::cout << "Adding Bootstrapping Keys..."  <<endl;
     vector<int> gal_steps_vector;
     gal_steps_vector.push_back(0);
     for(int i = 0; i < logN - 1; i++){
@@ -98,11 +100,11 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
     bootstrapper.addLeftRotKeys_Linear_to_vector_3(gal_steps_vector);
 
     ckks_evaluator.decryptor.create_galois_keys_from_steps(gal_steps_vector, *(ckks_evaluator.galois_keys));
-    std::cout << "Galois key generated from steps vector." << endl;
+    //std::cout << "Galois key generated from steps vector." << endl;
 
     bootstrapper.slot_vec.push_back(logn);
 
-    std::cout << "Generating Linear Transformation Coefficients..." << endl;
+    //std::cout << "Generating Linear Transformation Coefficients..." << endl;
     bootstrapper.generate_LT_coefficient_3();
 
     vector<double> sparse(sparse_slots, 0.0);
@@ -129,17 +131,35 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
     ckks_evaluator.decryptor.decrypt(cipher, plain);
     ckks_evaluator.encoder.decode(plain, before);
 
-    auto start = system_clock::now();
-
     PhantomCiphertext rtn;
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
     bootstrapper.bootstrap_3(rtn, cipher);
-
-    duration<double> sec = system_clock::now() - start;
-    std::cout << "Bootstrapping took: " << sec.count() << "s" << endl;
-    std::cout << "Return cipher level: " << rtn.coeff_modulus_size() << endl;
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    //duration<double> sec = system_clock::now() - start;
+    std::cout << "bootstrapping Kernel execution time: " << elapsedTime << " ms" << std::endl;  
 
     ckks_evaluator.decryptor.decrypt(rtn, plain);
     ckks_evaluator.encoder.decode(plain, after);
+
+    ASSERT_EQ(before.size(), after.size());
+
+    Eigen::VectorXcd input_eigen = vectorToEigen(before);
+    Eigen::VectorXcd output_eigen = vectorToEigen(after);
+    Eigen::VectorXd absolute_error = (input_eigen - output_eigen).cwiseAbs();
+    Eigen::VectorXd relative_error = absolute_error.cwiseQuotient(input_eigen.cwiseAbs());
+ 
+    double mse = (input_eigen - output_eigen).squaredNorm() / input_eigen.size();
+    std::cout << "boootstrapping Mean Squared Error (MSE): " << mse << std::endl;
+
+    double max_error = absolute_error.maxCoeff();
+    std::cout << "bootstrapping Max Error: " << max_error << std::endl;
+
 
     double mean_err = 0;
     for (long i = 0; i < sparse_slots; i++) {
@@ -151,7 +171,16 @@ void run_bootstrapping_test(long boundary_K, long deg, long scale_factor, long i
 }
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest1){
-        run_bootstrapping_test(25, 59, 2, 1, 16, 10, 15, 0, 46, 51, 16, 14, 0);
+    // TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest1){
+    //     run_bootstrapping_test(15, 14, 42, 45, 3, 14);
+    // }
+    // TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest2){
+    //     run_bootstrapping_test(15, 14, 46, 43, 3, 14);
+    // }
+    TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest3){
+        run_bootstrapping_test(16, 15, 48, 54, 16, 14);
+    }
+    TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest4){
+        run_bootstrapping_test(16, 15, 46, 51, 16, 14);
     }
 }
