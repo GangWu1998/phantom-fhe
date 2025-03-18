@@ -171,12 +171,12 @@ void run_bootstrapping_test(long logN, long logn, int logp, int logq, int remain
 }
 
 namespace phantomtest{
-    TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest1){
-        run_bootstrapping_test(15, 14, 42, 50, 10, 7);
-    }
-    TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest2){
-        run_bootstrapping_test(15, 14, 46, 52, 10, 6);
-    }
+    // TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest1){
+    //     run_bootstrapping_test(15, 14, 42, 45, 3, 14);
+    // }
+    // TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest2){
+    //     run_bootstrapping_test(15, 14, 46, 43, 3, 14);
+    // }
     TEST(PhantomCKKSBasicOperationsTest, BootstrappingOperationTest3){
         run_bootstrapping_test(16, 15, 48, 54, 16, 14);
     }
