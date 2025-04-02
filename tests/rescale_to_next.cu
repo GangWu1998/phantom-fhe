@@ -65,7 +65,7 @@ void run_multi_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
-    ckks_evaluator.evaluator.rescale_to_next(cipher1, dest_rescale);
+    ckks_evaluator.evaluator.rescale_to_next(cipher1_multiply, dest_rescale);
     cudaEventRecord(stop, 0);
     cudaEventSynchronize(stop);
     float elapsedTime;

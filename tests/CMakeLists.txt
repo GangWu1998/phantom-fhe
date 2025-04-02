@@ -12,6 +12,7 @@ foreach(TEST_SOURCE ${TEST_SOURCES})
         ${NTL_LIBRARY} 
         ${GMP_LIBRARY} 
         ${GMPXX_LIBRARY}
+	Eigen3::Eigen
     )
     target_include_directories(${TEST_NAME} PRIVATE 
         ${CMAKE_SOURCE_DIR}/include

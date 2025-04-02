@@ -9,7 +9,7 @@ project(phantom
 # Options
 option(PHANTOM_USE_CUDA_PTX "Use CUDA PTX Assembly" ON)
 option(PHANTOM_BUILD_EXAMPLES "Build examples" ON)
-option(PHANTOM_BUILD_TESTS "Build tests" OFF)
+option(PHANTOM_BUILD_TESTS "Build tests" ON)
 
 if (PHANTOM_USE_CUDA_PTX)
     add_compile_definitions(PHANTOM_USE_CUDA_PTX)
@@ -84,13 +84,20 @@ if(PHANTOM_BUILD_TESTS)
       googletest
       URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
     )
+    #Eigen
+    FetchContent_Declare(
+      eigen
+      GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+      GIT_TAG 3.4.0 
+    )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(googletest)
+    FetchContent_MakeAvailable(eigen)
     # Enable testing
     enable_testing()
-
     # Add the tests subdirectory
     add_subdirectory(tests)
+
 endif()
