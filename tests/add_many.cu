@@ -13,8 +13,6 @@ using namespace phantom::arith;
 using namespace phantom::util;
 using namespace std;
 
-const double EPSILON = 0.1;
-
 std::vector<complex<double>> generate_random_vector(size_t size) {
     std::vector<complex<double>> result(size);
     std::random_device rd;
@@ -72,7 +70,7 @@ void run_add_test(size_t poly_modulus_degree, const vector<int>& coeff_modulus, 
     for(size_t i = 2; i < cts.size(); i++){
         ckks_evaluator.evaluator.add_inplace(dest_many, cts[i]);
     }
-    cudaEventRecord(stop, 0);
+    cudaEventRecord(stop, 0); 
     cudaEventSynchronize(stop);
     float elapsedTime;
     cudaEventElapsedTime(&elapsedTime, start, stop);

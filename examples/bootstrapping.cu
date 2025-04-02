@@ -88,7 +88,13 @@ int main() {
 
   std::cout << "Generating Optimal Minimax Polynomials..." << endl;
   bootstrapper.prepare_mod_polynomial();
-
+  std::ifstream in("./cosine.txt");
+  if (!in) {
+      std::cerr << "Failed to open file.\n";
+      return -1;
+  }
+  bootstrapper.mod_reducer->sin_cos_polynomial.read_heap_from_file(in);
+  in.close();
   std::cout << "Adding Bootstrapping Keys..." << endl;
   vector<int> gal_steps_vector;
   gal_steps_vector.push_back(0);

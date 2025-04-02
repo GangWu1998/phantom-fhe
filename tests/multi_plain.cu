@@ -13,8 +13,6 @@ using namespace phantom::arith;
 using namespace phantom::util;
 using namespace std;
 
-const double EPSILON = 0.1;
-
 std::vector<complex<double>> generate_random_vector(size_t size) {
     std::vector<complex<double>> result(size);
     std::random_device rd;
