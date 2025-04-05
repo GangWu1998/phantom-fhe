@@ -28,21 +28,28 @@ void ModularReducer::double_angle_formula_scaled(PhantomCiphertext &cipher, doub
 
 void ModularReducer::generate_sin_cos_polynomial() {
   poly_generator->generate_optimal_poly(sin_cos_polynomial);
+  //printf("generate_sin_cos_poly??\n"); 
   sin_cos_polynomial.generate_poly_heap();
 }
 
 void ModularReducer::generate_inverse_sine_polynomial() {
   inverse_poly_generator->generate_optimal_poly(inverse_sin_polynomial);
+  //printf("generate_inverse_sine_poly??\n"); 
+  //printf("inverse_deg = %ld\n", inverse_deg);
   if (inverse_deg > 3) inverse_sin_polynomial.generate_poly_heap_odd();
+  //printf("generate_poly_heap_odd??\n");}
   if (inverse_deg == 1) {
+    //printf("inverse_deg == 1\n");
     scale_inverse_coeff = to_double(inverse_sin_polynomial.coeff[1]);
+    printf("inverse_sin_polynomial.coeff[1]= %ld",inverse_sin_polynomial.coeff[1]);
     for (int i = 0; i < num_double_formula; i++) scale_inverse_coeff = sqrt(scale_inverse_coeff);
-    sin_cos_polynomial.constmul(to_RR(scale_inverse_coeff));
-    sin_cos_polynomial.generate_poly_heap();
+    //sin_cos_polynomial.constmul(to_RR(scale_inverse_coeff));
+    //sin_cos_polynomial.generate_poly_heap();
   }
 }
 
 void ModularReducer::write_polynomials() {
+  //printf("when use write polynomials?\n");
   ofstream sin_cos_out("cosine.txt"), inverse_out("inverse_sine.txt");
   sin_cos_polynomial.write_heap_to_file(sin_cos_out);
   inverse_sin_polynomial.write_heap_to_file(inverse_out);
@@ -51,14 +58,22 @@ void ModularReducer::write_polynomials() {
 }
 
 void ModularReducer::modular_reduction(PhantomCiphertext &rtn, PhantomCiphertext &cipher) {
+  //printf("error1\n");
+  fflush(stdout);
   PhantomCiphertext tmp1, tmp2;
+  //printf("error2\n");
+  fflush(stdout);
   PhantomPlaintext tmpplain;
+  //printf("error3\n");
+  fflush(stdout);
   tmp1 = cipher;
-
+  //printf("error4\n");
+  fflush(stdout);
   sin_cos_polynomial.homomorphic_poly_evaluation(ckks, tmp2, tmp1);
 
   // ckks->print_decrypted_ct(tmp2, 10);
-
+  //printf("error5\n");
+  fflush(stdout);
   if (inverse_deg == 1) {
     double curr_scale = scale_inverse_coeff;
     for (int i = 0; i < num_double_formula; i++) {

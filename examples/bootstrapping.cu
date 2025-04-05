@@ -87,14 +87,53 @@ int main() {
       &ckks_evaluator);
 
   std::cout << "Generating Optimal Minimax Polynomials..." << endl;
-  bootstrapper.prepare_mod_polynomial();
-  std::ifstream in("./cosine.txt");
-  if (!in) {
-      std::cerr << "Failed to open file.\n";
-      return -1;
-  }
-  bootstrapper.mod_reducer->sin_cos_polynomial.read_heap_from_file(in);
-  in.close();
+
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
+    //bootstrapper.prepare_mod_polynomial();
+    std::ifstream in1("./cosine.txt");
+    if (!in1) {
+        std::cerr << "Failed to open file.\n";
+        return -1;
+    }
+    bootstrapper.mod_reducer->sin_cos_polynomial.read_heap_from_file(in1);
+    in1.close();
+
+    bootstrapper.mod_reducer->sin_cos_polynomial.generate_poly_heap();
+
+  // std::ifstream in2("./inverse_sine.txt");
+  // if (!in2) {
+  //     std::cerr << "Failed to open file.\n";
+  //     return -1;
+  // }
+  // printf("bad_alloc1\n");
+  // bootstrapper.mod_reducer->sin_cos_polynomial.read_heap_from_file(in2);
+  // printf("bad_alloc2\n");
+  // in2.close();
+  // printf("bad_alloc3\n");
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    float elapsedTime;
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    std::cout << "bootstrapping sin_cos_polynomial execution time: " << elapsedTime << " ms" << std::endl; 
+
+    cudaEvent_t start_inverse_sine, stop_inverse_sine;
+    cudaEventCreate(&start_inverse_sine);
+    cudaEventCreate(&stop_inverse_sine);
+    cudaEventRecord(start_inverse_sine, 0);
+    bootstrapper.mod_reducer->generate_inverse_sine_polynomial();
+    cudaEventRecord(stop_inverse_sine, 0);
+    cudaEventSynchronize(stop_inverse_sine);
+    float elapsedTime_inverse_sine;
+    cudaEventElapsedTime(&elapsedTime_inverse_sine, start_inverse_sine, stop_inverse_sine);
+    //duration<double> sec = system_clock::now() - start;
+    std::cout << "bootstrapping inverse_sine_polynomial Kernel execution time: " << elapsedTime << " ms" << std::endl;  
+
+  // bootstrapper.mod_reducer->generate_sin_cos_polynomial();
+  // bootstrapper.mod_reducer->generate_inverse_sine_polynomial();
+
   std::cout << "Adding Bootstrapping Keys..." << endl;
   vector<int> gal_steps_vector;
   gal_steps_vector.push_back(0);
@@ -138,12 +177,12 @@ int main() {
   ckks_evaluator.decryptor.decrypt(cipher, plain);
   ckks_evaluator.encoder.decode(plain, before);
 
-  auto start = system_clock::now();
+  auto start2 = system_clock::now();
 
   PhantomCiphertext rtn;
   bootstrapper.bootstrap_3(rtn, cipher);
 
-  duration<double> sec = system_clock::now() - start;
+  duration<double> sec = system_clock::now() - start2;
   std::cout << "Bootstrapping took: " << sec.count() << "s" << endl;
   std::cout << "Return cipher level: " << rtn.coeff_modulus_size() << endl;
 

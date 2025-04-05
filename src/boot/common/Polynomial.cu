@@ -200,7 +200,18 @@ void Polynomial::generate_poly_heap_manual(long k, long m) {
       }
     }
   }
+  // /*wugang debug use*/
+  //   for (long i = 0; i < heaplen; i++) {
+  //       if (poly_heap[i] != nullptr) {
+  //           std::cout << "Polynomial at index " << i << ": Degree = " << poly_heap[i]->deg << ", Coefficients = ";
+  //           for (int j = 0; j <= poly_heap[i]->deg; j++) {
+  //               std::cout << poly_heap[i]->chebcoeff[j] << " ";
+  //           }
+  //           std::cout << std::endl;
+  //       }
+  //   }
 }
+
 
 void Polynomial::generate_poly_heap_odd() {
   oddbabycount(heap_k, heap_m, deg);
@@ -208,6 +219,7 @@ void Polynomial::generate_poly_heap_odd() {
 }
 
 void Polynomial::generate_poly_heap() {
+  //printf("heap_k = %ld, heap_m = %ld\n", heap_k, heap_m);
   babycount(heap_k, heap_m, deg);
   generate_poly_heap_manual(heap_k, heap_m);
 }
@@ -227,33 +239,87 @@ void Polynomial::write_heap_to_file(ofstream &out) {
   }
 }
 
-void Polynomial::read_heap_from_file(ifstream &in) {
-  long index = 0, in_deg;
+// void Polynomial::read_heap_from_file(ifstream &in) {
+//   long index = 0, in_deg;
 
-  in >> heaplen;
+//   in >> heaplen;
 
-  poly_heap = new Polynomial *[heaplen];
+//   printf("in_deg = %ld , heaplen = %ld\n", in_deg, heaplen);
 
-  for (int i = 0; i < heaplen; i++) {
-    poly_heap[i] = 0;
-  }
+//   poly_heap = new Polynomial *[heaplen];
 
-  while (index < heaplen - 1) {
-    in >> index >> in_deg;
-    poly_heap[index] = new Polynomial(in_deg);
-    for (int i = 0; i <= in_deg; i++) {
-      in >> poly_heap[index]->chebcoeff[i];
+//   for (int i = 0; i < heaplen; i++) {
+//     poly_heap[i] = 0;
+//   }
+
+//   while (index < heaplen - 1) {
+//     in >> index >> in_deg;
+//     poly_heap[index] = new Polynomial(in_deg);
+//     for (int i = 0; i <= in_deg; i++) {
+//       in >> poly_heap[index]->chebcoeff[i];
+//     }
+//     poly_heap[index]->cheb_to_power();
+//   }
+
+//   copy(*poly_heap[0]);
+
+//   /*wugang debug use*/
+//   for (int index = 0; index < heaplen; index++) {
+//     if (poly_heap[index]) {
+//         // 打印多项式的索引和度数
+//         std::cout << "Index: " << index << " Degree: " << poly_heap[index]->deg << std::endl;
+//         std::cout << "Coefficients: ";
+//         // 打印每个系数
+//         for (int i = 0; i <= poly_heap[index]->deg; i++) {
+//             std::cout << poly_heap[index]->chebcoeff[i] << " ";
+//         }
+//         std::cout << std::endl << std::endl; // 打印空行以分隔多项式
+//     }
+//   }
+// }
+
+void Polynomial::read_heap_from_file(std::ifstream &in) {
+    long index = 0, in_deg;
+
+    in >> heaplen;
+    if (heaplen <= 0) {
+        std::cerr << "Invalid heap length: " << heaplen << std::endl;
+        return;
     }
-    poly_heap[index]->cheb_to_power();
-  }
 
-  copy(*poly_heap[0]);
+    poly_heap = new Polynomial*[heaplen];
+
+    for (int i = 0; i < heaplen; i++) {
+        poly_heap[i] = nullptr;
+    }
+
+    while (index < heaplen - 1) {
+        in >> index >> in_deg;
+        if (index >= heaplen) {
+            std::cerr << "Index out of bounds: " << index << std::endl;
+            break;
+        }
+        poly_heap[index] = new Polynomial(in_deg);
+        for (int i = 0; i <= in_deg; i++) {
+            in >> poly_heap[index]->chebcoeff[i];
+        }
+        poly_heap[index]->cheb_to_power();
+    }
+
+    if (poly_heap[0] != nullptr) {
+        copy(*poly_heap[0]);
+    } else {
+        std::cerr << "poly_heap[0] is nullptr, copy operation skipped." << std::endl;
+    }
 }
 
 void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphertext &rtn, PhantomCiphertext &cipher) {
   double zero = 1.0 / cipher.scale();
 
   if (deg == 1) {
+    //printf("deg = 1\n");
+    fflush(stdout);
+    fflush(stdout);
     ckks->evaluator.multiply_const(cipher, to_double(coeff[1]), rtn);
     ckks->evaluator.rescale_to_next_inplace(rtn);
     ckks->evaluator.add_const(rtn, to_double(coeff[0]), rtn);
@@ -261,6 +327,8 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
   }
 
   else if (deg == 2) {
+    //printf("deg = 2\n");
+    fflush(stdout);
     PhantomCiphertext squared;
     ckks->evaluator.square(cipher, squared);
     ckks->evaluator.relinearize_inplace(squared, *(ckks->relin_keys));
@@ -282,6 +350,8 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
   }
 
   else if (deg == 3) {
+    //printf("deg = 3\n");
+    fflush(stdout);
     PhantomCiphertext squared, cubic;
     ckks->evaluator.square(cipher, squared);
     ckks->evaluator.relinearize_inplace(squared, *(ckks->relin_keys));
@@ -312,13 +382,19 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
   }
 
   else {
+    //printf("deg = else\n");
+    fflush(stdout);
+    //printf("heap_k1 = %ld, heap_m1 = %ld\n", heap_k, heap_m);
     vector<PhantomCiphertext> baby(heap_k, PhantomCiphertext());
+    //printf("error1\n");
+    fflush(stdout);
     vector<bool> babybool(heap_k, false);
 
     PhantomCiphertext addtmp1, addtmp2;
 
     PhantomPlaintext tmpplain;
-
+    //printf("error2\n");
+    fflush(stdout);
     baby[1] = cipher;
     babybool[1] = true;
 
@@ -326,6 +402,8 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
     // cout << "heap_k: " << heap_k << endl;  // 8
 
     // i = 2, 4, 8
+    //printf("error3\n");
+    fflush(stdout);
     for (int i = 2; i < heap_k; i *= 2) {
       ckks->evaluator.square(baby[i / 2], baby[i]);
       ckks->evaluator.relinearize_inplace(baby[i], *(ckks->relin_keys));
@@ -342,10 +420,12 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
     //   ckks->print_decrypted_ct(baby[i], 10);
     // }
     // cout << endl;
-
+    //printf("error4\n");
+    fflush(stdout);
     long lpow2, res, diff;
     PhantomCiphertext tmp;
-
+    //printf("error5\n");
+    fflush(stdout);
     for (int i = 1; i < heap_k; i++) {
       if (!babybool[i]) {
         // i = 3, 5, 6, 7
@@ -354,11 +434,9 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
         diff = abs(lpow2 - res);
 
         // cout << "lpow2: " << lpow2 << " res: " << res << " diff: " << diff << endl;
-
         ckks->evaluator.multiply_reduced_error(baby[lpow2], baby[res], *(ckks->relin_keys), baby[i]);
         ckks->evaluator.rescale_to_next_inplace(baby[i]);
         ckks->evaluator.double_inplace(baby[i]);
-
         ckks->evaluator.sub_reduced_error(baby[i], baby[diff], baby[i]);
         babybool[i] = true;
       }
@@ -370,19 +448,15 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
     //   ckks->print_decrypted_ct(baby[i], 10);
     // }
     // cout << endl;
-
     vector<PhantomCiphertext> giant(heap_m, PhantomCiphertext());
     vector<bool> giantbool(heap_m, false);
-
     giantbool[0] = true;
     lpow2 = (1 << ((int)ceil(log(heap_k) / log(2)) - 1));
     res = heap_k - lpow2;
     diff = abs(lpow2 - res);
-
     if (res == 0) {
       giant[0] = baby[lpow2];
     }
-
     else if (diff == 0) {
       ckks->evaluator.square(baby[lpow2], giant[0]);
       ckks->evaluator.relinearize_inplace(giant[0], *(ckks->relin_keys));
@@ -390,17 +464,14 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
       ckks->evaluator.double_inplace(giant[0]);
       ckks->evaluator.add_const(giant[0], -1.0, giant[0]);
     }
-
     else {
       ckks->evaluator.multiply_reduced_error(baby[lpow2], baby[res], *(ckks->relin_keys), giant[0]);
       ckks->evaluator.rescale_to_next_inplace(giant[0]);
       ckks->evaluator.double_inplace(giant[0]);
       ckks->evaluator.sub_reduced_error(giant[0], baby[diff], giant[0]);
     }
-
     for (int i = 1; i < heap_m; i++) {
       giantbool[i] = true;
-
       ckks->evaluator.square(giant[i - 1], giant[i]);
       ckks->evaluator.relinearize_inplace(giant[i], *(ckks->relin_keys));
       ckks->evaluator.rescale_to_next_inplace(giant[i]);
@@ -414,14 +485,12 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
     //   ckks->print_decrypted_ct(giant_ct, 10);
     // }
     // cout << endl;
-
     vector<PhantomCiphertext> cipherheap((1 << (heap_m + 1)) - 1, PhantomCiphertext());
     vector<bool> cipherheapbool((1 << (heap_m + 1)) - 1, false);
 
     long heapfirst = (1 << heap_m) - 1;
     long heaplast = (1 << (heap_m + 1)) - 1;
     double zero = 1.0 / cipher.scale();
-
     for (int i = heapfirst; i < heaplast; i++) {
       if (poly_heap[i]) {
         cipherheapbool[i] = true;
@@ -451,7 +520,6 @@ void Polynomial::homomorphic_poly_evaluation(CKKSEvaluator *ckks, PhantomCiphert
 
     long depth = heap_m;
     long gindex = 0;
-
     while (depth != 0) {
       depth--;
       heapfirst = (1 << depth) - 1;

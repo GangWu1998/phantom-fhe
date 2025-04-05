@@ -1831,6 +1831,7 @@ void Bootstrapper::generate_LT_coefficient_3() {
 
 void Bootstrapper::prepare_mod_polynomial() {
   mod_reducer->generate_sin_cos_polynomial();
+  //printf("how to run??\n"); 
   mod_reducer->generate_inverse_sine_polynomial();
   mod_reducer->write_polynomials();
 }
@@ -3100,12 +3101,19 @@ void Bootstrapper::bootstrap_full_3(PhantomCiphertext &rtncipher, PhantomCiphert
   std::cout << "Coefftoslot...4" << endl;
   PhantomCiphertext rtn1, rtn2;
   coefftoslot_full_3(rtn1, rtn2, cipher);
-
+  //printf("yes\n");
   std::cout << "Modular reduction..." << endl;
+  //printf("make modular_reduction\n");
+  fflush(stdout);
   PhantomCiphertext modrtn1, modrtn2;
+  //printf("start modular_reduction\n");
+  fflush(stdout);
   mod_reducer->modular_reduction(modrtn1, rtn1);
+  //printf("success in modular_reduction1\n");
+  fflush(stdout);
   mod_reducer->modular_reduction(modrtn2, rtn2);
-
+  //printf("success in modular_reduction2\n");
+  fflush(stdout);
   std::cout << "Slottocoeff..." << endl;
   slottocoeff_full_3(rtncipher, modrtn1, modrtn2);
 
@@ -3151,8 +3159,9 @@ void Bootstrapper::bootstrap_sparse_real_3(PhantomCiphertext &rtncipher, Phantom
 
   std::cout << "Modular reduction..." << endl;
   PhantomCiphertext modrtn;
+  std::cout << "start modular_reduce" << endl;
   mod_reducer->modular_reduction(modrtn, rtn);
-
+  std::cout << "sucess in modular_reduce" << endl;
   if (logn == 0) {
     const auto modulus = ckks->context->first_context_data().parms().coeff_modulus();
     auto curr_level = ckks->context->get_context_data(modrtn.params_id()).chain_depth();
@@ -3361,11 +3370,14 @@ void Bootstrapper::bootstrap_3(PhantomCiphertext &rtncipher, PhantomCiphertext &
   }
 
   initial_scale = cipher.scale();
-  if (logn == logNh)
+  if (logn == logNh){
+    //printf("im full");
     bootstrap_full_3(rtncipher, cipher);
-  else
+  }
+  else{
+    //printf("im sparse");
     bootstrap_sparse_3(rtncipher, cipher);
-
+  }
   cudaStreamSynchronize(cipher.data_ptr().get_stream());
 }
 
